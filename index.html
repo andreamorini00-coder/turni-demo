@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IdeaLab · Demo Turni & Ferie</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Bricolage Grotesque',sans-serif;background:#fafaf8;color:#111827;min-height:100vh}
+.demo-bar{background:#7c3aed;color:#fff;text-align:center;padding:9px 16px;font-size:12px;font-weight:700;letter-spacing:.5px}
+.demo-bar a{color:#e9d5ff;text-decoration:underline}
+.header{background:#fff;border-bottom:2px solid #111827;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:36px;z-index:10}
+.header h1{font-size:22px;font-weight:800;color:#111827;margin:0}
+.header-sub{font-family:'DM Mono',monospace;font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:2px;margin-bottom:2px}
+.nav{display:flex;gap:8px;padding:12px 16px;background:#fff;border-bottom:1px solid #f3f4f6;position:sticky;top:93px;z-index:9}
+.nav-btn{padding:8px 16px;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;font-family:'Bricolage Grotesque',sans-serif}
+.nav-btn.active{background:#111827;color:#fff}
+.nav-btn.inactive{background:#f3f4f6;color:#6b7280}
+.content{padding:16px;max-width:960px;margin:0 auto}
+.mes-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.btn-mes{background:#111827;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;font-size:13px}
+.mes-title{font-weight:800;font-size:16px;color:#111827;text-transform:capitalize}
+.settimana{background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:14px;overflow-x:auto}
+.set-header{font-weight:700;color:#111827;margin-bottom:10px;font-size:13px;font-family:'DM Mono',monospace;color:#6b7280}
+.turni-grid{display:grid;grid-template-columns:130px repeat(7,1fr) 56px;gap:4px;min-width:700px}
+.th-cell{text-align:center;font-size:10px;font-weight:700;color:#6b7280;padding:4px 2px;font-family:'DM Mono',monospace}
+.th-cell.festa{background:#f5e8d0;border-radius:6px;color:#8a6d3b}
+.nome-cell{font-size:11px;font-weight:700;color:#111827;display:flex;flex-direction:column;justify-content:center;padding:2px 4px}
+.ruolo-cell{font-size:9px;color:#9ca3af;font-weight:400;font-family:'DM Mono',monospace}
+.g-cell{border-radius:6px;padding:6px 2px;text-align:center;font-size:9px;font-weight:700;cursor:pointer;min-height:34px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;line-height:1.2;transition:transform .1s}
+.g-cell:active{transform:scale(.95)}
+.g-x{background:#f3f4f6;color:#9ca3af}
+.g-mat{background:#dcfce7;color:#166534}
+.g-pom{background:#fecaca;color:#991b1b}
+.g-gel{background:#bfdbfe;color:#1e40af}
+.g-fer{background:#fce7f3;color:#9d174d}
+.g-per{background:#dbeafe;color:#1d4ed8}
+.g-festa{background:#f5e8d0;color:#8a6d3b}
+.ore-cell{background:#f3f4f6;color:#6b7280;border-radius:6px;padding:6px 2px;text-align:center;font-size:10px;font-weight:800;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center}
+.ore-ok{background:#dcfce7;color:#166534}
+.ore-over{background:#fecaca;color:#991b1b}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:22px;width:100%;max-width:360px}
+.modal h3{font-size:15px;font-weight:800;margin-bottom:6px;color:#111827}
+.modal-sub{font-family:'DM Mono',monospace;font-size:10px;color:#9ca3af;margin-bottom:16px}
+.quick-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.quick-btn{padding:12px 8px;border-radius:10px;border:2px solid transparent;font-weight:700;cursor:pointer;font-size:13px;font-family:'Bricolage Grotesque',sans-serif;text-align:center}
+.q-mat{background:#dcfce7;color:#166534}
+.q-pom{background:#fecaca;color:#991b1b}
+.q-fer{background:#fce7f3;color:#9d174d;grid-column:1/-1}
+.q-per{background:#dbeafe;color:#1d4ed8;grid-column:1/-1}
+.pro-hint{background:#eeedfe;border-radius:10px;padding:12px 14px;font-size:12px;color:#5b21b6;font-family:'DM Mono',monospace;line-height:1.6;margin-bottom:14px;text-align:center}
+.modal-cancel{width:100%;padding:11px;border:none;border-radius:10px;background:#f3f4f6;color:#6b7280;font-weight:700;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;font-size:14px}
+/* FERIE TAB */
+.ferie-card{background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:16px;margin-bottom:10px}
+.ferie-nome{font-size:15px;font-weight:800;color:#111827}
+.ferie-ruolo{font-size:10px;font-family:'DM Mono',monospace;color:#9ca3af;margin-bottom:12px;margin-top:2px}
+.ferie-bars{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:flex;align-items:center;gap:10px;font-family:'DM Mono',monospace;font-size:11px}
+.bar-label{width:70px;color:#6b7280}
+.bar-track{flex:1;background:#f1f5f9;border-radius:20px;height:10px;overflow:hidden}
+.bar-fill{height:100%;border-radius:20px;transition:width .5s}
+.bar-fill.ferie{background:#f472b6}
+.bar-fill.permessi{background:#a78bfa}
+.bar-val{width:50px;text-align:right;font-weight:700;color:#111827;font-size:12px}
+.locked-hint{background:#eeedfe;border-radius:8px;padding:10px 12px;font-family:'DM Mono',monospace;font-size:10px;color:#5b21b6;text-align:center;margin-top:14px}
+</style>
+</head>
+<body>
+
+<div class="demo-bar" style="position:sticky;top:0;z-index:20">
+  🎯 VERSIONE DEMO — IdeaLab &nbsp;·&nbsp; <a href="https://idealab-app.lovable.app" target="_blank">Acquista la versione completa →</a>
+</div>
+
+<div class="header">
+  <div>
+    <div class="header-sub">Demo — Dolce Vita Pasticceria · Milano</div>
+    <h1>Gestione Turni & Ferie</h1>
+  </div>
+  <div style="font-family:'DM Mono',monospace;font-size:10px;color:#22c55e;display:flex;align-items:center;gap:5px">
+    <span style="width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block"></span>Demo attiva
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" id="btn-mese" onclick="setVista('mese')">📅 Mese</button>
+  <button class="nav-btn inactive" id="btn-ferie" onclick="setVista('ferie')">🏖️ Ferie & Permessi</button>
+</div>
+
+<div class="content">
+  <div id="view-mese"></div>
+  <div id="view-ferie" style="display:none"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)chiudiModal()">
+  <div class="modal">
+    <h3 id="modal-title">Modifica turno</h3>
+    <div class="modal-sub" id="modal-sub"></div>
+    <div class="quick-btns">
+      <button class="quick-btn q-mat" onclick="setQuick('07:00','14:00')">🟢 7:00–14:00<br><span style="font-size:10px;font-weight:400">Mattino</span></button>
+      <button class="quick-btn q-pom" onclick="setQuick('14:00','20:30')">🔴 14:00–20:30<br><span style="font-size:10px;font-weight:400">Pomeriggio</span></button>
+      <button class="quick-btn q-fer" onclick="setQuick('F',null)">🏖️ Feria</button>
+      <button class="quick-btn q-per" onclick="setQuick('PE',null)">📋 Permesso</button>
+    </div>
+    <div class="pro-hint">
+      🔒 Orari personalizzati, turno gelateria e modifica residui ferie<br>disponibili nella versione <strong>Pro</strong>
+    </div>
+    <button class="modal-cancel" onclick="chiudiModal()">Chiudi</button>
+  </div>
+</div>
+
+<script>
+const DIPENDENTI=[
+  {nome:"Laura",ruolo:"Supervisore"},
+  {nome:"Marco",ruolo:"Pasticcere"},
+  {nome:"Giulia",ruolo:"Pasticcera"},
+  {nome:"Antonio",ruolo:"Pasticcere"},
+  {nome:"Elena",ruolo:"Pasticcera"},
+  {nome:"Roberto",ruolo:"Lab"},
+  {nome:"Sara",ruolo:"Pasticcera (PT Ven-Dom)"},
+  {nome:"Luca",ruolo:"Direzione"},
+];
+const GIORNI=["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
+const MESI_IT=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+
+// Turni demo pre-compilati
+const TURNI_DEMO={
+  "Laura":  [{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"},{i:"14:00",f:"20:30"},{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"},null],
+  "Marco":  [{i:"14:00",f:"20:30"},{i:"14:00",f:"20:30"},{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"},{i:"14:00",f:"20:30"},{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"}],
+  "Giulia": [{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"},{i:"14:00",f:"20:30"},{i:"07:00",f:"14:00"},null,{i:"07:00",f:"14:00"},{i:"14:00",f:"20:30"}],
+  "Antonio":[null,{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"},{i:"14:00",f:"20:30"},{i:"07:00",f:"14:00"}],
+  "Elena":  [{i:"14:00",f:"20:30"},{i:"07:00",f:"14:00"},null,{i:"07:00",f:"14:00"},{i:"14:00",f:"20:30"},{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"}],
+  "Roberto":[{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"},{i:"14:00",f:"20:30"},null,{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"},null],
+  "Sara":   [null,null,null,null,"F",{i:"07:00",f:"14:00"},{i:"14:00",f:"20:30"}],
+  "Luca":   [{i:"07:00",f:"14:00"},null,{i:"07:00",f:"14:00"},{i:"07:00",f:"14:00"},null,null,null],
+};
+const FERIE_DEMO={
+  "Laura":  {ferie:14,ferieUsate:5,permessi:32,permessiUsati:8},
+  "Marco":  {ferie:14,ferieUsate:8,permessi:32,permessiUsati:16},
+  "Giulia": {ferie:14,ferieUsate:3,permessi:32,permessiUsati:4},
+  "Antonio":{ferie:14,ferieUsate:10,permessi:32,permessiUsati:24},
+  "Elena":  {ferie:14,ferieUsate:6,permessi:32,permessiUsati:8},
+  "Roberto":{ferie:14,ferieUsate:2,permessi:32,permessiUsati:0},
+  "Sara":   {ferie:7,ferieUsate:1,permessi:16,permessiUsati:0},
+  "Luca":   {ferie:14,ferieUsate:4,permessi:32,permessiUsati:8},
+};
+
+var meseAttuale=new Date();
+var turniLocali={};// modifiche demo locali
+var editModal=null;
+
+function fmtData(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function G(id){return document.getElementById(id);}
+
+function calcPasqua(y){var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),gi=((h+l-7*m+114)%31)+1;return String(mo).padStart(2,"0")+"-"+String(gi).padStart(2,"0");}
+function getFest(ds){var p=ds.split("-"),y=parseInt(p[0]),md=p[1]+"-"+p[2];var f={"01-01":"Capodanno","01-06":"Epifania","04-25":"Liberazione","05-01":"Lavoro","06-02":"Repubblica","08-15":"Ferragosto","11-01":"Ognissanti","12-08":"Immacolata","12-25":"Natale","12-26":"S.Stefano"};if(f[md])return f[md];var pmd=calcPasqua(y);if(md===pmd)return"Pasqua";var pm=parseInt(pmd.split("-")[0]),pg=parseInt(pmd.split("-")[1]),pk=new Date(y,pm-1,pg+1),pkmd=String(pk.getMonth()+1).padStart(2,"0")+"-"+String(pk.getDate()).padStart(2,"0");if(md===pkmd)return"Pasquetta";return null;}
+
+function getTurnoDemo(nome,idx){
+  var key=nome+"|"+idx;
+  if(turniLocali[key]!==undefined) return turniLocali[key];
+  var arr=TURNI_DEMO[nome]||[];
+  return arr[idx]||null;
+}
+function ore(nome,idx){var t=getTurnoDemo(nome,idx);if(!t||!t.i||!t.f)return 0;var h1=parseInt(t.i),m1=parseInt(t.i.split(":")[1]),h2=parseInt(t.f),m2=parseInt(t.f.split(":")[1]);return((h2*60+m2)-(h1*60+m1))/60;}
+
+function getSettimane(d){
+  var primo=new Date(d.getFullYear(),d.getMonth(),1);
+  var dow=primo.getDay(),lun=new Date(primo);
+  lun.setDate(primo.getDate()-(dow===0?6:dow-1));
+  var setts=[];
+  for(var i=0;i<6;i++){
+    var ini=new Date(lun);ini.setDate(lun.getDate()+i*7);
+    var fin=new Date(ini);fin.setDate(ini.getDate()+6);
+    if(ini.getMonth()===d.getMonth()||fin.getMonth()===d.getMonth()){
+      var giorni=[];
+      for(var j=0;j<7;j++){var g=new Date(ini);g.setDate(ini.getDate()+j);giorni.push(fmtData(g));}
+      setts.push({inizio:fmtData(ini),fine:fmtData(fin),giorni:giorni});
+    }
+  }
+  return setts;
+}
+
+function renderMese(){
+  var setts=getSettimane(meseAttuale);
+  var meseLbl=MESI_IT[meseAttuale.getMonth()]+" "+meseAttuale.getFullYear();
+  var html='<div class="mes-header"><button class="btn-mes" onclick="cambiaMese(-1)">◀ Precedente</button><span class="mes-title">'+meseLbl+'</span><button class="btn-mes" onclick="cambiaMese(1)">Successivo ▶</button></div>';
+
+  setts.forEach(function(sett,si){
+    // Calcola indice giorno settimana per dati demo (settimana 0 = corrente)
+    html+='<div class="settimana"><div class="set-header">Settimana '+(si+1)+' · '+sett.inizio+' → '+sett.fine+'</div>';
+    html+='<div class="turni-grid">';
+    html+='<div></div>';
+    sett.giorni.forEach(function(data,i){
+      var fest=getFest(data),num=parseInt(data.split("-")[2]);
+      html+='<div class="th-cell'+(fest?" festa":"")+'">'+(GIORNI[i].substring(0,3))+" "+num+(fest?'<br><span style="font-size:7px">'+fest+'</span>':"")+'</div>';
+    });
+    html+='<div class="th-cell">Ore</div>';
+
+    DIPENDENTI.forEach(function(dip){
+      var oreTot=0;
+      html+='<div class="nome-cell">'+dip.nome+'<span class="ruolo-cell">'+dip.ruolo+'</span></div>';
+      sett.giorni.forEach(function(data,i){
+        // Usa indice giorno nella settimana come chiave demo
+        var baseIdx=i; // 0=Lun .. 6=Dom
+        var t=getTurnoDemo(dip.nome,baseIdx);
+        var fest=getFest(data);
+        var cls="g-cell ",label="–";
+        if(t==="F"){cls+="g-fer";label="F";}
+        else if(t==="PE"){cls+="g-per";label="PE";}
+        else if(t&&t.i){
+          var h=parseInt(t.i);
+          cls+=h<14?"g-mat":"g-pom";
+          label=t.i+"–"+t.f;
+          oreTot+=ore(dip.nome,i);
+        }
+        else if(fest){cls+="g-festa";label="–";}
+        else{cls+="g-x";}
+        var sd=dip.nome.replace(/'/g,"\\'");
+        html+='<div class="'+cls+'" onclick="apriModal(\''+sd+'\','+i+',\''+data+'\')">'+label+'</div>';
+      });
+      var oc=oreTot>=39&&oreTot<=43?"ore-ok":oreTot>43?"ore-over":"";
+      html+='<div class="ore-cell '+oc+'">'+(oreTot>0?oreTot.toFixed(1):"–")+'</div>';
+    });
+    html+='</div></div>';
+  });
+
+  // Legenda
+  html+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;padding:4px 0">';
+  [["#dcfce7","#166534","Mattino"],["#fecaca","#991b1b","Pomeriggio"],["#fce7f3","#9d174d","F = Feria"],["#dbeafe","#1d4ed8","PE = Permesso"]].forEach(function(x){
+    html+='<span style="background:'+x[0]+';color:'+x[1]+';padding:3px 10px;border-radius:6px;font-family:DM Mono,monospace;font-size:10px;font-weight:700">'+x[2]+'</span>';
+  });
+  html+='</div>';
+
+  G("view-mese").innerHTML=html;
+}
+
+function renderFerie(){
+  var html='<div style="font-family:DM Mono,monospace;font-size:11px;color:#9ca3af;background:#f9fafb;border-radius:8px;padding:10px 14px;margin-bottom:14px">Situazione ferie e permessi maturati al '+new Date().toLocaleDateString("it-IT")+'</div>';
+  DIPENDENTI.forEach(function(dip){
+    var f=FERIE_DEMO[dip.nome];
+    var fr=f.ferie-f.ferieUsate,pr=f.permessi-f.permessiUsati;
+    var fp=Math.round((f.ferieUsate/f.ferie)*100),pp=Math.round((f.permessiUsati/f.permessi)*100);
+    html+='<div class="ferie-card">';
+    html+='<div class="ferie-nome">'+dip.nome+'</div>';
+    html+='<div class="ferie-ruolo">'+dip.ruolo+'</div>';
+    html+='<div class="ferie-bars">';
+    html+='<div class="bar-row"><span class="bar-label">🏖️ Ferie</span><div class="bar-track"><div class="bar-fill ferie" style="width:'+fp+'%"></div></div><span class="bar-val">'+fr+'/'+f.ferie+' gg</span></div>';
+    html+='<div class="bar-row"><span class="bar-label">📋 Permessi</span><div class="bar-track"><div class="bar-fill permessi" style="width:'+pp+'%"></div></div><span class="bar-val">'+pr+'/'+f.permessi+' h</span></div>';
+    html+='</div></div>';
+  });
+  html+='<div class="locked-hint">🔒 Modifica residui e maturazione automatica disponibili nella versione <strong>Pro</strong><br><a href="https://idealab-app.lovable.app" target="_blank" style="color:#7c3aed;font-weight:700">Scopri IdeaLab Pro →</a></div>';
+  G("view-ferie").innerHTML=html;
+}
+
+function cambiaMese(d){meseAttuale=new Date(meseAttuale.getFullYear(),meseAttuale.getMonth()+d,1);renderMese();}
+function setVista(v){
+  G("view-mese").style.display=v==="mese"?"block":"none";
+  G("view-ferie").style.display=v==="ferie"?"block":"none";
+  G("btn-mese").className="nav-btn "+(v==="mese"?"active":"inactive");
+  G("btn-ferie").className="nav-btn "+(v==="ferie"?"active":"inactive");
+  if(v==="ferie")renderFerie();
+}
+
+function apriModal(nome,idx,data){
+  editModal={nome:nome,idx:idx,data:data};
+  G("modal-title").textContent=nome+" · "+data;
+  G("modal-sub").textContent="Seleziona il turno per questa giornata";
+  G("modal").classList.add("open");
+}
+function chiudiModal(){G("modal").classList.remove("open");editModal=null;}
+function setQuick(tipo,fine){
+  if(!editModal)return;
+  var val=tipo==="F"?"F":tipo==="PE"?"PE":{i:tipo,f:fine};
+  turniLocali[editModal.nome+"|"+editModal.idx]=val;
+  chiudiModal();
+  renderMese();
+}
+
+renderMese();
+</script>
+</body>
+</html>
