@@ -152,9 +152,12 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#fafaf8;color:#1118
 </style>
 </head>
 <body>
+<div style="background:#7c3aed;color:#fff;text-align:center;padding:9px 16px;font-family:DM Mono,monospace;font-size:12px;font-weight:700;position:sticky;top:0;z-index:999">
+  🎯 VERSIONE DEMO — WorkMor &nbsp;·&nbsp; <a href="https://workmor.app" target="_blank" style="color:#e9d5ff;text-decoration:underline">Acquista la versione completa →</a>
+</div>
 
-<!-- LOGIN -->
-<div id="login">
+<!-- LOGIN nascosto nella demo -->
+<div id="login" style="display:none">
   <div class="l-logo">Work<span>Mor</span></div>
   <div class="l-sub">Gestione Turni & Ferie</div>
   <div class="l-free-badge">✓ Versione Free · max 5 dipendenti</div>
@@ -322,8 +325,24 @@ if (!DATA.turni) { DATA.turni = {}; saveData(DATA); }
 if (!DATA.ferie) { DATA.ferie = {}; saveData(DATA); }
 if (!DATA.permessi) { DATA.permessi = {}; saveData(DATA); }
 
-var IS_PRO = DATA.isPro || false;
+var IS_PRO = false;
 var FREE_LIMIT = 5;
+
+// DEMO: precarica dati fittizi se vuoti
+if(!DATA.turni||Object.keys(DATA.turni).length===0){
+  var oggi=new Date();
+  function dd(off){var d=new Date(oggi);d.setDate(d.getDate()+off);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+  DATA.turni={};
+  DATA.turni["Mario|"+dd(0)]={inizio:"07:00",fine:"14:00"};
+  DATA.turni["Mario|"+dd(1)]={inizio:"14:00",fine:"21:00"};
+  DATA.turni["Mario|"+dd(2)]={tipo:"F"};
+  DATA.turni["Laura|"+dd(0)]={inizio:"14:00",fine:"21:00"};
+  DATA.turni["Laura|"+dd(1)]={inizio:"07:00",fine:"14:00"};
+  DATA.turni["Laura|"+dd(3)]={tipo:"M"};
+  DATA.turni["Giuseppe|"+dd(0)]={inizio:"07:00",fine:"14:00"};
+  DATA.turni["Giuseppe|"+dd(2)]={inizio:"14:00",fine:"21:00"};
+  saveData(DATA);
+}
 var editModal = null;
 var meseAttuale = new Date();
 var vista = "mese";
@@ -992,6 +1011,13 @@ function doLogin(){
   }
 }
 G("pwd").addEventListener("keydown",function(e){if(e.key==="Enter")doLogin();});
+
+// DEMO: auto-login senza password
+G("login").classList.add("hidden");
+G("app").classList.add("on");
+G("hdr-attivita").textContent="Demo — Dolce Vita Pasticceria";
+setSync("ok");
+renderMese();
 
 // Auto-login se sessione attiva
 if(sessionStorage.getItem("wm_auth")){
